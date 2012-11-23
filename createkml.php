@@ -920,7 +920,7 @@ global $SwVersion13x;
 
 	# read header record if 'DualAntenna.mode' present (version 1.30 and up)
 	# else just do as usual
-  if (array_key_exists ( 'DualAntenna.mode' , $order ))
+  if (array_key_exists ( 'DualAntenna.mode' , $row ))
   {
   	$SwVersion = $SwVersion13x;
 	}
@@ -1121,7 +1121,7 @@ global $SwVersion13x;
   $order = fgetcsv($csvreader);
   $row = fgetcsv($csvreader);
   $row = array_combine ( $order , $row );
-  if ($SwVersion != $OldSwVersion)
+  if (($SwVersion != $OldSwVersion) && ($SwVersion != $SwVersion13x) )
   {
   	$order = fgetcsv($csvreader);
   	$row = fgetcsv($csvreader);
