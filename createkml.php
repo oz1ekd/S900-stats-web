@@ -906,7 +906,8 @@ global $HostName;
 global $AcuSerialNumber;
 global $AduSerialNumber;
 global $SwVersion;
-global  $OldSwVersion;
+global $OldSwVersion;
+global $SwVersion13x;
 
   $csvreader = fopen($Fcsv, "r");
   $order = fgetcsv($csvreader);
@@ -917,7 +918,13 @@ global  $OldSwVersion;
   }
   $row = array_combine ( $order , $row );
 
-	# read header record if present (version 1.30 and up)
+	# read header record if 'DualAntenna.mode' present (version 1.30 and up)
+	# else just do as usual
+  if (array_key_exists ( 'DualAntenna.mode' , $order ))
+  {
+  	$SwVersion = $SwVersion13x;
+	}
+	# read header record if present (version 1.40 and up)
 	# else just do as usual
   if ($order[0] == 'Hostname')
   {

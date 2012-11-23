@@ -9,6 +9,7 @@ $AcuSerialNumber = '';
 $AduSerialNumber = '';
 $OldSwVersion = 'before 1.30';
 $SwVersion = $OldSwVersion;
+$SwVersion13x = '1.3x';
 
 $vartype =  array("int","string","float","float","float","string","string","int","int","int","int","int","int","int","int","int","int","int","int","string","string","string","string","int","string","string","int","int","int","int","int");
 
