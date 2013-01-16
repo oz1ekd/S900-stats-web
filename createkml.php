@@ -616,57 +616,109 @@ $gx_TimeSpanElement  = $Doc->createElement('gx:TimeSpan');
 }
 
 ##############################################################################
-function checkWarningErrorLevels($notused)
+function checkWarningErrorLevels($DualAntennaMode)
 {
 ## override style in case of warning condition
 ## RSSI.Av,RX Lock. (%),Logon. (%),Pos OK. (%),VMU Connection. (%),Blocking. (%)
-global  $paramchecklist;
+## ADDED for DUAL version 1.3x forward
+## DualAntenna.active (%), DualAntenna.mode, DualAntenna.logon_remote
 global  $IconStyleIndicator;
 global  $colorStyleNumber;
 global  $colorStyleLimit;
 global  $colorStyleCheckCount;
 global  $colorStyleText;
+global  $paramchecklist;
 global  $temp;
 
 $resul = 0;
    $i = 0;
-   foreach ($paramchecklist as $key)
+   switch($DualAntennaMode)
    {
-   	 if ($colorStyleLimit[$i] < 0)
-   	 {
-	     if (((floatval($temp[$key]) < abs($colorStyleLimit[$i]))) )
-	     {
-	       $temp[$key] = $temp[$key] . ' !' . $colorStyleText[$i];
-	       if (( $result < 6) && ($i <= $colorStyleCheckCount)) 
-	        $resul = 3;
-	       if ($i > $colorStyleCheckCount)
-	        $resul = 6;
-	//         logf('Limit :' . $colorStyleLimit[$i] . ' data : ' . $key . ' ' . $row[$key]);
-			   if ( $IconStyleIndicator < $colorStyleNumber[$i] )
-			   {
-			     $IconStyleIndicator = $colorStyleNumber[$i];
+   	case "SINGLE":
+		   foreach ($paramchecklist as $key)
+		   {
+		   	 if ($colorStyleLimit[$i] < 0)
+		   	 {
+			     if (((floatval($temp[$key]) < abs($colorStyleLimit[$i]))) )
+			     {
+			       $temp[$key] = $temp[$key] . ' !' . $colorStyleText[$i];
+			       if (( $result < 6) && ($i <= $colorStyleCheckCount)) 
+			        $resul = 3;
+			       if ($i > $colorStyleCheckCount)
+			        $resul = 6;
+			//         logf('Limit :' . $colorStyleLimit[$i] . ' data : ' . $key . ' ' . $row[$key]);
+					   if ( $IconStyleIndicator < $colorStyleNumber[$i] )
+					   {
+					     $IconStyleIndicator = $colorStyleNumber[$i];
+					   }
+			     }
 			   }
-	     }
-	   }
-     if ($colorStyleLimit[$i] > 0)
-     {
-	     if (((floatval($temp[$key]) > abs($colorStyleLimit[$i]))) )
-	     {
-	       $temp[$key] = $temp[$key] . ' !' . $colorStyleText[$i] ;
-	       if (( $result < 6) && ($i <= $colorStyleCheckCount)) 
-	        $resul = 3;
-	       if ($i > $colorStyleCheckCount)
-	        $resul = 6;
-	//         logf('Limit   :' . $colorStyleLimit[$i] . ' data : ' . $key . ' ' . $row[$key]);
-	    
-		     if ($IconStyleIndicator < $colorStyleNumber[$i] )
+		     if ($colorStyleLimit[$i] > 0)
 		     {
-		       $IconStyleIndicator = $colorStyleNumber[$i];
-		     }
-	     }
-	   }    
-     $i = $i + 1;
-    } 
+			     if (((floatval($temp[$key]) > abs($colorStyleLimit[$i]))) )
+			     {
+			       $temp[$key] = $temp[$key] . ' !' . $colorStyleText[$i] ;
+			       if (( $result < 6) && ($i <= $colorStyleCheckCount)) 
+			        $resul = 3;
+			       if ($i > $colorStyleCheckCount)
+			        $resul = 6;
+			//         logf('Limit   :' . $colorStyleLimit[$i] . ' data : ' . $key . ' ' . $row[$key]);
+			    
+				     if ($IconStyleIndicator < $colorStyleNumber[$i] )
+				     {
+				       $IconStyleIndicator = $colorStyleNumber[$i];
+				     }
+			     }
+			   }    
+		     $i = $i + 1;
+		    } 
+		    break;
+	    case 'SLAVE':
+		    $resul = 2;
+	    	$logonpct = 100 - ($temp['DualAntenna.active (%)'] - $temp['Logon. (%)']);
+		    if ($logonpct < 70 )
+		    {
+		    	// red marking
+		    	$IconStyleIndicator = 18;
+		    	$temp['DualAntenna.active (%)'] = $temp['DualAntenna.active (%)'] . ' !';
+		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
+		    	$resul = 8;
+		    }
+		    else
+		    if ($logonpct < 97 )
+		    {
+		    	// green marking
+		    	$IconStyleIndicator = 17;
+		    	$temp['DualAntenna.active (%)'] = $temp['DualAntenna.active (%)'] . ' !';
+		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
+		    	$resul = 5;
+		    	
+		    }
+	    	break;
+	    case 'MASTER':
+		    $resul = 1;
+	    	$logonpct = $temp['DualAntenna.logon_remote (%)'] + $temp['Logon. (%)'];
+		    if ($logonpct < 70 )
+		    {
+		    	// red marking
+		    	$IconStyleIndicator = 18;
+		    	$temp['DualAntenna.logon_remote (%)'] = $temp['DualAntenna.logon_remote (%)'] . ' !';
+		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
+		    	$resul = 7;
+		    }
+		    else
+		    if ($logonpct < 97 )
+		    {
+		    	// green marking
+		    	$IconStyleIndicator = 17;
+		    	$temp['DualAntenna.logon_remote (%)'] = $temp['DualAntenna.logon_remote (%)'] . ' !';
+		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
+		    	$resul = 4;
+		    }
+	    	break;
+	 }
+	    	
+
     return $resul;
 }
 
@@ -785,7 +837,7 @@ global  $OldSwVersion;
 	// returns result in global $IconStyleIndicator
 	// and 0 = OK, 3 = warning, 6 = error
 	$temp = $row;
-	$warninglevel = checkWarningErrorLevels($x);
+	$warninglevel = checkWarningErrorLevels($temp['DualAntenna.mode']);
 	$row = $temp;
   # Loop through the columns and create a <Data> element for every field that has a $value.
   #if $row[$key]:
@@ -862,7 +914,7 @@ global  $temp;
   // 0 = ok, 3 = warning, 6 = fault
   $temp = $row;
   $trackLineIndex = 0;
-	$trackLineIndex += checkWarningErrorLevels($notused);
+	$trackLineIndex += checkWarningErrorLevels($temp['DualAntenna.mode']);
 	
   $valueText = '#' . $trackLine[$trackLineIndex];
   $valueText = $Doc->createTextNode($valueText);
