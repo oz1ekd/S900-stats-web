@@ -23,28 +23,38 @@ $LastLogLine = 0;
 $temp = 0;
 
 //#######################################################################################################
+ $bgrLtGreen 	= "ff00ffd8";
+ $bgrGreen 		= "ff00ff7f";
+ $bgrRed   		= "ff0000ff";
+ $bgrDkBLue   = "ffff0000";
+ $bgrYellow 	= "ffff00ff";
+ $bgrOrange 	= "ff3399ff";
+ $bgrBlue 		= "ffffd700";
+ $bgrBlack 		= "ff000000";
+ $bgrWhite   	= "ffffffff";
+//#######################################################################################################
 
 $trackLineArrSize = 9;
 
 $trackLine =  
-              array("trackLine-Single",  "trackLine-Master",  "trackLine-Slave",
-										"trackLine-Single_w","trackLine-Master_w","trackLine-Slave_w",
-										"trackLine-Single_e","trackLine-Master_e","trackLine-Slave_e");
+              array("trackLine-Single",  "trackLine-DualActive",  "trackLine-DualInActive",
+										"trackLine-Single_w","trackLine-DualActive_w","trackLine-DualInActive_w",
+										"trackLine-Single_e","trackLine-DualActive_e","trackLine-DualInActive_e");
 	
 $trackStylesLineNormal = 
-              array("trackLine-Single_n",  "trackLine-Master_n",  "trackLine-Slave_n",
-										"trackLine-Single_w_n","trackLine-Master_w_n","trackLine-Slave_w_n",
-										"trackLine-Single_e_n","trackLine-Master_e_n","trackLine-Slave_e_n");
+              array("trackLine-Single_n",  "trackLine-DualActive_n",  "trackLine-DualInActive_n",
+										"trackLine-Single_w_n","trackLine-DualActive_w_n","trackLine-DualInActive_w_n",
+										"trackLine-Single_e_n","trackLine-DualActive_e_n","trackLine-DualInActive_e_n");
 
 $trackStylesLineHighLi = 
-              array("trackLine-Single_h",  "trackLine-Master_h",  "trackLine-Slave_h",
-										"trackLine-Single_w_h","trackLine-Master_w_h","trackLine-Slave_w_h",
-										"trackLine-Single_e_h","trackLine-Master_e_h","trackLine-Slave_e_h");
+              array("trackLine-Single_h",  "trackLine-DualActive_h",  "trackLine-DualInActive_h",
+										"trackLine-Single_w_h","trackLine-DualActive_w_h","trackLine-DualInActive_w_h",
+										"trackLine-Single_e_h","trackLine-DualActive_e_h","trackLine-DualInActive_e_h");
 
 $trackStylesLineColor = 
-              array("ff7fff00","ff7fff00","ff7fff00",
-										"ff00d7ff","ff00d7ff","ff00d7ff",
-										"ff0000ff","ff0000ff","ff0000ff");
+              array($bgrGreen ,$bgrOrange ,$bgrLtGreen ,
+										 $bgrBlue, $bgrBlue, $bgrBlue,
+										$bgrRed,$bgrRed,$bgrRed);
       
 //#######################################################################################################
 
@@ -96,25 +106,30 @@ $trackStylesHeadingPng = array(
  $paramwlist = array("Warning levels","RSSI.Av","RX Lock. (%)","Logon. (%)","Pos OK. (%)","VMU Connection. (%)","Blocking. (%)");
  $paramelist = array("Error levels","RSSI.Av","RX Lock. (%)","Logon. (%)","Pos OK. (%)","VMU Connection. (%)","Blocking. (%)");
 
- $warnlist		= array(0,-4.5,-98,-98,-98,-98,+2);
- $errorlist 	= array(0,-2.5,-70,-70,-70,-70,+20);
+// $warnlist		= array(0,-4.5,-98,-98,-98,-98,+2);
+// $errorlist 	= array(0,-2.5,-70,-70,-70,-70,+20);
+
+ $warnlist		= array(0,0,0,-97,0,0,+2);
+ $errorlist 	= array(0,0,0,-70,0,0,+20);
 
  $paramchecklist 	= array(
  									"RSSI.Av","RX Lock. (%)","Logon. (%)","Pos OK. (%)","VMU Connection. (%)","Blocking. (%)",
                   "RSSI.Av","RX Lock. (%)","Logon. (%)","Pos OK. (%)","VMU Connection. (%)","Blocking. (%)" );
 
+// ##  
+// ##   $colorStyleNumber 	= array(17				,17				,17				,17				,17				,19,
+// ##   														18				,18				,18				,18				,18				,20);
+// ##   $colorStyleLimit 	= array(-4.5			,-98			,-98			,-98			,-98			,+2,
+// ##   														-2.5			,-70			,-70			,-70			,-70			,+20);
  $colorStyleNumber 	= array(17				,17				,17				,17				,17				,19,
  														18				,18				,18				,18				,18				,20);
- $colorStyleLimit 	= array(-4.5			,-98			,-98			,-98			,-98			,+2,
- 														-2.5			,-70			,-70			,-70			,-70			,+20);
+ $colorStyleLimit 	= array(0			,0		,-97			,0			,0			,+2,
+ 														0			,0		,-70			,0			,0			,+20);
  $colorStyleText 		= array("warning"	,"warning","warning","warning","warning","warning",
  														'fault'		,'fault'	,'fault'	,'fault'	,'fault'	,'fault');
  $colorStyleCheckCount = 5;
  
- $bgrGreen 	= "ff7fff00";
- $bgrRed   	= "ff0000ff";
- $bgrBlue   	= "ffffffff";
- $bgrYellow 	= "ff00d7ff";
+
  $lastLong = 0;
  $lastLat  = 0;
 ?>

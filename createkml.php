@@ -161,11 +161,12 @@ global $bgrYellow;
 global $bgrRed;
 global $bgrGreen;
 global $bgrBlue;  
-  $valueText = $bgrBlue;
-  $scalesize = '0.5';
+
+  $valueText = $bgrGreen;
+  $scalesize = '0.6';
   if ($number == 17)
   {
-    $valueText = $bgrYellow;
+    $valueText = $bgrBlue;
     $scalesize = '0.8';
   }
   if ($number == 18)
@@ -175,7 +176,7 @@ global $bgrBlue;
   }
   if ($number == 19)
   {
-    $valueText = $bgrGreen;
+    $valueText = $bgrBlue;
     $scalesize = '0.8';
   }
   if ($number == 20)
@@ -229,17 +230,17 @@ global $bgrBlue;
  
   $styleurlelement = $Doc->createElement('Style');
   $styleurlelement->setAttribute('id', $trackStylesHeadingHighLi[$number]);
-  
+  $scalesize = '0.6';
   $iconStyleElement = $Doc->createElement('IconStyle');
   $color = $Doc->createElement('color');
-  $valueText = $bgrBlue;
+  $valueText = $bgrGreen;
   if ($number == 17)
-    $valueText = $bgrYellow;
+    $valueText = $bgrBlue;
   if ($number == 18)
     $valueText = $bgrRed;
   if ($number == 19)
   {
-    $valueText = $bgrGreen;
+    $valueText = $bgrBlue;
     $scalesize = '0.8';
   }
   if ($number == 20)
@@ -283,12 +284,14 @@ function makeStyleNormalTrackLine($Doc, $number)
 global $trackStylesLineNormal;
 global $trackStylesLineHighLi;
 global $trackStylesLineColor;
+global $temp;
+global $bgrBlack;
 
   $styleurlelement = $Doc->createElement('Style');
   $styleurlelement->setAttribute('id', $trackStylesLineNormal[$number]);
    $lineStyleElement = $Doc->createElement('LineStyle');
     $color = $Doc->createElement('color');
-     $valueText = $Doc->createTextNode($trackStylesLineColor[$number]); 
+     $valueText = $Doc->createTextNode($trackStylesLineColor[$number]);
      $color->appendChild($valueText);
     $lineStyleElement->appendChild($color);   
 
@@ -323,8 +326,8 @@ global $trackStylesLineColor;
   $styleurlelement->setAttribute('id', $trackStylesLineHighLi[$number]);
    $lineStyleElement = $Doc->createElement('LineStyle');
     $colorElement = $Doc->createElement('color');
-     $valueText = $Doc->createTextNode($trackStylesLineColor[$number]); 
-     $colorElement->appendChild($valueText);
+    $valueText = $Doc->createTextNode($trackStylesLineColor[$number]);
+    $colorElement->appendChild($valueText);
     $lineStyleElement->appendChild($colorElement);   
 
     $trackLineElement = $Doc->createElement('width');
@@ -674,7 +677,7 @@ $resul = 0;
 		    } 
 		    break;
 	    case 'SLAVE':
-		    $resul = 2;
+		    $resul = 1;
 	    	$logonpct = 100 - ($temp['DualAntenna.active (%)'] - $temp['Logon. (%)']);
 		    if ($logonpct < 70 )
 		    {
@@ -682,7 +685,7 @@ $resul = 0;
 		    	$IconStyleIndicator = 18;
 		    	$temp['DualAntenna.active (%)'] = $temp['DualAntenna.active (%)'] . ' !';
 		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
-		    	$resul = 8;
+		    	$resul = 7;
 		    }
 		    else
 		    if ($logonpct < 97 )
@@ -691,9 +694,10 @@ $resul = 0;
 		    	$IconStyleIndicator = 17;
 		    	$temp['DualAntenna.active (%)'] = $temp['DualAntenna.active (%)'] . ' !';
 		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
-		    	$resul = 5;
-		    	
+		    	$resul = 4;
 		    }
+	    	if ($temp['DualAntenna.active (%)'] < 50)
+	    		$resul++;	    	
 	    	break;
 	    case 'MASTER':
 		    $resul = 1;
@@ -715,6 +719,8 @@ $resul = 0;
 		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
 		    	$resul = 4;
 		    }
+	    	if ($temp['DualAntenna.active (%)'] < 50)
+	    		$resul++;
 	    	break;
 	 }
 	    	
@@ -916,7 +922,8 @@ global  $temp;
   $trackLineIndex = 0;
 	$trackLineIndex += checkWarningErrorLevels($temp['DualAntenna.mode']);
 	
-  $valueText = '#' . $trackLine[$trackLineIndex];
+
+ 	$valueText = '#' . $trackLine[$trackLineIndex];
   $valueText = $Doc->createTextNode($valueText);
   $styleURLElement->appendChild($valueText);
   $pathElement->appendChild($styleURLElement);
