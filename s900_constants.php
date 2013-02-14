@@ -25,13 +25,16 @@ $temp = 0;
 //#######################################################################################################
  $bgrLtGreen 	= "ff00ffd8";
  $bgrGreen 		= "ff00ff7f";
- $bgrRed   		= "ff0000ff";
+ $bgrRed   		= "c00000ff";
  $bgrDkBLue   = "ffff0000";
- $bgrYellow 	= "ffff00ff";
+ $bgrPink 		= "a0ff00ff";
  $bgrOrange 	= "ff3399ff";
  $bgrBlue 		= "ffffd700";
  $bgrBlack 		= "ff000000";
  $bgrWhite   	= "ffffffff";
+ $bgrWarning 	= $bgrPink;
+ $bgrError   	= $bgrRed ;
+ 
 //#######################################################################################################
 
 $trackLineArrSize = 9;
@@ -53,7 +56,7 @@ $trackStylesLineHighLi =
 
 $trackStylesLineColor = 
               array($bgrGreen ,$bgrOrange ,$bgrLtGreen ,
-										 $bgrBlue, $bgrBlue, $bgrBlue,
+										 $bgrPink, $bgrPink, $bgrPink,
 										$bgrRed,$bgrRed,$bgrRed);
       
 //#######################################################################################################
@@ -75,6 +78,12 @@ $trackStylesHeadingHighLi = array("track-none_h","track-0_h","track-1_h","track-
                      "track-4_h","track-5_h","track-6_h","track-7_h","track-8_h",
                      "track-9_h","track-10_h","track-11_h","track-12_h","track-13_h",
                      "track-14_h","track-15_h","warning_h","error_h","blockingWarning_h","blockingError_h");
+
+$trackStylesHeadingColor = 
+              array(	$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,
+              				$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,
+              				$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrGreen ,$bgrOrange ,
+										  $bgrPink, $bgrRed, $bgrPink, $bgrRed);
 
 $trackStylesHeadingPng = array(
 									"http://earth.google.com/images/kml-icons/track-directional/track-none.png",
@@ -132,4 +141,5 @@ $trackStylesHeadingPng = array(
 
  $lastLong = 0;
  $lastLat  = 0;
-?>
+ $lastTime = 0;
+ ?>
