@@ -29,7 +29,7 @@ $filen = '';
 	}
 
   echo '<p><br>Upload your .csv or .csv.gz file and retrieve the google kmz file for your own use afterwards.</br></br>';
-  echo '<b>Disclaimer:</b> You are about to upload a file with statistics data to this web site. By uploading this file you accept that Thrane & Thrane uses the data for analysis. <br>All data sets will be made anonymous.</p> ';
+  echo '<b>Disclaimer:</b> You are about to upload a file with statistics data to this web site. By uploading this file you accept that Cobham SATCOM uses the data for analysis. <br>Data sets will be made anonymous if used.</p> ';
 
 	?>
 

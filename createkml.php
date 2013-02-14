@@ -15,30 +15,33 @@ $NodeElement = $Doc->createElement($NodeName);
 }
 
 
-function calculateHeading($GPSlat1, $GPSlon1)
+function calculateHeading($GPSlat1, $GPSlon1,$GPSlat2, $GPSlon2)
 {
-global  $lastLong, $lastLat;  
-$lon2 = $lastLong;
-$lat2 = $lastLat;
+$lat2 = floatval($GPSlat2);
+$north2 = strpos($GPSlat2,'N');
+$lon2 = floatval($GPSlon2);
+$east2 = strpos($GPSlon2,'E');
 
-$lat1 = floatval($GPSlat1);
-$north = strpos($GPSlat1,'N');
-$lon1 = floatval($GPSlon1);
-$east = strpos($GPSlon1,'E');
-
- if ($north === FALSE) :
-  $lat1 = -$lat1;
+if ($north2 === FALSE) :
+  $lat2 = -$lat2;
 endif;
-if ($east === FALSE) :
-  $lon1 = -$lon1;
+if ($east2 === FALSE) :
+  $lon2 = -$lon2;
 endif;
- 
-$lastLong = $lon1;
-$lastLat = $lat1;
-
 if (($lon2 == 0) || ($lat2 == 0))
  return (-1);
- 
+
+$lat1 = floatval($GPSlat1);
+$north1 = strpos($GPSlat1,'N');
+$lon1 = floatval($GPSlon1);
+$east1 = strpos($GPSlon1,'E');
+
+if ($north1 === FALSE) :
+  $lat1 = -$lat1;
+endif;
+if ($east1 === FALSE) :
+  $lon1 = -$lon1;
+endif;
 if (($lon1 == $lon2) && ($lat1 == $lat2))
  return (-1);
 
@@ -55,6 +58,54 @@ if (($lon1 == $lon2) && ($lat1 == $lat2))
   return $bearing;
 }
 
+function calculateSpeed($GPSlat1, $GPSlon1,$GPSlat2, $GPSlon2,$time2, $time1)
+{
+$lat2 = floatval($GPSlat2);
+$north2 = strpos($GPSlat2,'N');
+$lon2 = floatval($GPSlon2);
+$east2 = strpos($GPSlon2,'E');
+
+if ($north2 === FALSE) :
+  $lat2 = -$lat2;
+endif;
+if ($east2 === FALSE) :
+  $lon2 = -$lon2;
+endif;
+if (($lon2 == 0) || ($lat2 == 0))
+ return (-1);
+
+$lat1 = floatval($GPSlat1);
+$north1 = strpos($GPSlat1,'N');
+$lon1 = floatval($GPSlon1);
+$east1 = strpos($GPSlon1,'E');
+
+if ($north1 === FALSE) :
+  $lat1 = -$lat1;
+endif;
+if ($east1 === FALSE) :
+  $lon1 = -$lon1;
+endif;
+if (($lon1 == $lon2) && ($lat1 == $lat2))
+ return (-1);
+ 
+    $delta_lat = $lat1 - $lat2 ;
+    $delta_lon = $lon1 - $lon2 ;
+
+    $earth_radius = 6372.795477598;
+
+    $alpha    = $delta_lat/2;
+    $beta     = $delta_lon/2;
+    $a        = sin(deg2rad($alpha)) * sin(deg2rad($alpha)) + cos(deg2rad($lat2)) * cos(deg2rad($lat1)) * sin(deg2rad($beta)) * sin(deg2rad($beta)) ;
+    $c        = asin(min(1, sqrt($a)));
+    $distance = 2*$earth_radius * $c;
+    $distance = round($distance, 4);
+		$Speed_knots = ($distance * 3600) / ($time2-$time1); // km/h
+		$Speed_knots = $Speed_knots / 1.852;
+		$Speed_Knots = round($Speed_knots, 1);
+
+
+  return $Speed_Knots;
+}
 
 function createSchema($Doc, $order, $vartype)
 {
@@ -152,36 +203,27 @@ function makeStyleNormalHeading($Doc, $number)
 global $trackStylesHeadingPng;
 global $trackStylesHeadingNormal;
 global $trackStylesHeadingHighLi;
+global $trackStylesHeadingColor;
 
 global $trackColor;
 global $lastLong;
 global $lastLat;
 
-global $bgrYellow;
-global $bgrRed;
-global $bgrGreen;
-global $bgrBlue;  
-
-  $valueText = $bgrGreen;
-  $scalesize = '0.6';
+  $scalesize = '0.5';
   if ($number == 17)
   {
-    $valueText = $bgrBlue;
     $scalesize = '0.8';
   }
   if ($number == 18)
   {
-    $valueText = $bgrRed;
     $scalesize = '0.8';
   }
   if ($number == 19)
   {
-    $valueText = $bgrBlue;
     $scalesize = '0.8';
   }
   if ($number == 20)
   {
-    $valueText = $bgrRed;
     $scalesize = '0.8';
   }
     
@@ -189,7 +231,7 @@ global $bgrBlue;
   $styleurlelement->setAttribute('id', $trackStylesHeadingNormal[$number]);
    $iconStyleElement = $Doc->createElement('IconStyle');
     $color = $Doc->createElement('color');
-     $valueText = $Doc->createTextNode($valueText);
+     $valueText = $Doc->createTextNode($trackStylesHeadingColor[$number]);
      $color->appendChild($valueText);
     $iconStyleElement->appendChild($color);   
     $scaleElement = $Doc->createElement('scale');
@@ -223,32 +265,22 @@ function makeStyleHighlightHeading($Doc, $number)
 #  <!-- Normal track-none style -->;
 global $trackStylesHeadingPng;
 global $trackStylesHeadingHighLi;
-global $bgrYellow;
-global $bgrRed;
-global $bgrGreen;
-global $bgrBlue;
+global $trackStylesHeadingColor;
  
   $styleurlelement = $Doc->createElement('Style');
   $styleurlelement->setAttribute('id', $trackStylesHeadingHighLi[$number]);
-  $scalesize = '0.6';
+  $scalesize = '0.5';
   $iconStyleElement = $Doc->createElement('IconStyle');
   $color = $Doc->createElement('color');
-  $valueText = $bgrGreen;
-  if ($number == 17)
-    $valueText = $bgrBlue;
-  if ($number == 18)
-    $valueText = $bgrRed;
   if ($number == 19)
   {
-    $valueText = $bgrBlue;
     $scalesize = '0.8';
   }
   if ($number == 20)
   {
-    $valueText = $bgrRed;
     $scalesize = '0.8';
   } 
-  $valueText = $Doc->createTextNode($valueText);
+  $valueText = $Doc->createTextNode($trackStylesHeadingColor[$number]);
   $color->appendChild($valueText);
   $iconStyleElement->appendChild($color);
   $styleurlelement->appendChild($iconStyleElement);
@@ -296,10 +328,7 @@ global $bgrBlack;
     $lineStyleElement->appendChild($color);   
 
     $trackLineElement = $Doc->createElement('width');
-     if ($number < 3 )
-       $valueText = $Doc->createTextNode('1');
-     else
-       $valueText = $Doc->createTextNode('3');
+    $valueText = $Doc->createTextNode('2');
      
      $trackLineElement->appendChild($valueText);
     $lineStyleElement->appendChild($trackLineElement);
@@ -424,7 +453,8 @@ function makeStyleNormalWaypointval($Doc)
 { 
 #  <!-- Normal track-none style -->;
 global $trackStylesHeadingPng;
-global $bgrBlue;
+global $bgrGreen;
+
   $styleurlelement = $Doc->createElement('Style');
   $styleurlelement->setAttribute('id', 'waypoint_n');
   
@@ -450,14 +480,14 @@ global $bgrBlue;
 function makeStyleHighlightWaypointval($Doc)
 {
 global $trackStylesHeadingPng;
-global $bgrBlue;
+global $bgrPink;
 #  <!-- Normal track-none style -->;
   $styleurlelement = $Doc->createElement('Style');
   $styleurlelement->setAttribute('id', 'waypoint_h');
   
   $iconStyleElement = $Doc->createElement('IconStyle');
   $color = $Doc->createElement('color');
-  $valueText = $Doc->createTextNode($bgrBlue);
+  $valueText = $Doc->createTextNode($bgrPink);
   $color->appendChild($valueText);
   $iconStyleElement->appendChild($color);
   $styleurlelement->appendChild($iconStyleElement);
@@ -650,7 +680,7 @@ $resul = 0;
 			       if ($i > $colorStyleCheckCount)
 			        $resul = 6;
 			//         logf('Limit :' . $colorStyleLimit[$i] . ' data : ' . $key . ' ' . $row[$key]);
-					   if ( $IconStyleIndicator < $colorStyleNumber[$i] )
+					   if (( $IconStyleIndicator < $colorStyleNumber[$i]) && ($key == 'Blocking. (%)') )
 					   {
 					     $IconStyleIndicator = $colorStyleNumber[$i];
 					   }
@@ -667,10 +697,10 @@ $resul = 0;
 			        $resul = 6;
 			//         logf('Limit   :' . $colorStyleLimit[$i] . ' data : ' . $key . ' ' . $row[$key]);
 			    
-				     if ($IconStyleIndicator < $colorStyleNumber[$i] )
-				     {
-				       $IconStyleIndicator = $colorStyleNumber[$i];
-				     }
+					   if (( $IconStyleIndicator < $colorStyleNumber[$i]) && ($key == 'Blocking. (%)') )
+					   {
+					     $IconStyleIndicator = $colorStyleNumber[$i];
+					   }
 			     }
 			   }    
 		     $i = $i + 1;
@@ -682,7 +712,7 @@ $resul = 0;
 		    if ($logonpct < 70 )
 		    {
 		    	// red marking
-		    	$IconStyleIndicator = 18;
+//		    	$IconStyleIndicator = 18;
 		    	$temp['DualAntenna.active (%)'] = $temp['DualAntenna.active (%)'] . ' !';
 		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
 		    	$resul = 7;
@@ -691,7 +721,7 @@ $resul = 0;
 		    if ($logonpct < 97 )
 		    {
 		    	// green marking
-		    	$IconStyleIndicator = 17;
+//		    	$IconStyleIndicator = 17;
 		    	$temp['DualAntenna.active (%)'] = $temp['DualAntenna.active (%)'] . ' !';
 		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
 		    	$resul = 4;
@@ -705,7 +735,7 @@ $resul = 0;
 		    if ($logonpct < 70 )
 		    {
 		    	// red marking
-		    	$IconStyleIndicator = 18;
+//		    	$IconStyleIndicator = 18;
 		    	$temp['DualAntenna.logon_remote (%)'] = $temp['DualAntenna.logon_remote (%)'] . ' !';
 		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
 		    	$resul = 7;
@@ -714,7 +744,7 @@ $resul = 0;
 		    if ($logonpct < 97 )
 		    {
 		    	// green marking
-		    	$IconStyleIndicator = 17;
+//		    	$IconStyleIndicator = 17;
 		    	$temp['DualAntenna.logon_remote (%)'] = $temp['DualAntenna.logon_remote (%)'] . ' !';
 		    	$temp['Logon. (%)'] = $temp['Logon. (%)'] . ' !';
 		    	$resul = 4;
@@ -765,7 +795,8 @@ global  $colorStyleNumber;
 global  $colorStyleLimit;
 global  $trackHeading; 
 global  $IconStyleIndicator;
-global  $lastLong, $lastLat;
+global 	$trackStylesLineColor;
+global  $lastLong, $lastLat, $lastTime;
 global  $lastCoordinates;
 global  $temp;
 global  $HostInfo;
@@ -774,6 +805,8 @@ global  $AcuSerialNumber;
 global  $AduSerialNumber;
 global  $SwVersion;
 global  $OldSwVersion;
+global 	$bgrWarning;
+global  $bgrError;
 
 
   $placemarkElement = $Doc->createElement('Placemark');
@@ -831,7 +864,11 @@ global  $OldSwVersion;
 		$extElement->appendChild($dataElement);
   }
   
-   $GPSheading = calculateHeading($row['POS.Lat (degree)'], $row['POS.Long (degree)']);
+   $GPSSpeed = calculateSpeed($row['POS.Lat (degree)'], $row['POS.Long (degree)'],$lastLat, $lastLong,$row['UTC. (s)'],$lastTime );
+   $GPSheading = calculateHeading($row['POS.Lat (degree)'], $row['POS.Long (degree)'],$lastLat, $lastLong );
+   $lastLat = $row['POS.Lat (degree)'];
+   $lastLong = $row['POS.Long (degree)'];
+   $lastTime = $row['UTC. (s)'];
    if ($GPSheading != -1)
    {
    	$heading = $GPSheading * 10;
@@ -843,7 +880,10 @@ global  $OldSwVersion;
 	// returns result in global $IconStyleIndicator
 	// and 0 = OK, 3 = warning, 6 = error
 	$temp = $row;
-	$warninglevel = checkWarningErrorLevels($temp['DualAntenna.mode']);
+	if ($SwVersion != $OldSwVersion)
+		$warninglevel = checkWarningErrorLevels($temp['DualAntenna.mode']);
+	else
+		$warninglevel = checkWarningErrorLevels('SINGLE');
 	$row = $temp;
   # Loop through the columns and create a <Data> element for every field that has a $value.
   #if $row[$key]:
@@ -851,6 +891,20 @@ global  $OldSwVersion;
 	{
 		if ($key === 'Heading.Samp (degree)')
 		{
+			$dataElement = $Doc->createElement('Data');
+			$dataElement->setAttribute('name', 'Speed.GPS (knots)');
+			$valueElement = $Doc->createElement('value');
+			$dataElement->appendChild($valueElement);
+			if ($GPSSpeed != -1)
+			{
+			 $valueText = $Doc->createTextNode($GPSSpeed);
+			}
+			else
+			{
+			 $valueText = $Doc->createTextNode('cannot calculate!');
+			}
+			$valueElement->appendChild($valueText);
+			$extElement->appendChild($dataElement);
 			$dataElement = $Doc->createElement('Data');
 			$dataElement->setAttribute('name', 'Heading.GPS (degree)');
 			$valueElement = $Doc->createElement('value');
@@ -880,6 +934,17 @@ global  $OldSwVersion;
   $valueText = $Doc->createTextNode('#' . $trackHeading[$IconStyleIndicator]);
   $styleURLElement->appendChild($valueText);
   $placemarkElement->appendChild($styleURLElement);
+//  if ($warninglevel > 2)
+  {
+	  $styleurlelement = $Doc->createElement('Style');
+	  $iconStyleElement = $Doc->createElement('IconStyle');
+	  $color = $Doc->createElement('color');
+	  $valueText = $Doc->createTextNode($trackStylesLineColor[$warninglevel]);
+	  $color->appendChild($valueText);
+	  $iconStyleElement->appendChild($color);
+	  $styleurlelement->appendChild($iconStyleElement);
+	  $placemarkElement->appendChild($styleurlelement);
+  }
   
   $pointElement = $Doc->createElement('Point');
   $coordinates = $row['POS.Long (degree)'] . ',' . $row['POS.Lat (degree)'] . ',0';
@@ -896,11 +961,13 @@ function createPath($Doc, $row, $order)
 global  $lastCoordinates;
 global  $trackLine;
 global  $temp;
+global 	$SwVersion;
+global  $OldSwVersion;
 
   $pathElement = $Doc->createElement('Placemark');
-
-  $nameElement = createNodeElement($Doc, 'name', $row['UTC (YYYY-MM-DD hh:mm)']);
-  $pathElement->appendChild($nameElement);
+//
+//  $nameElement = createNodeElement($Doc, 'name', $row['UTC (YYYY-MM-DD hh:mm)']);
+//  $pathElement->appendChild($nameElement);
 
 ## override style in case of error condition
 ## RSSI.Av,RX Lock. (%),Logon. (%),Pos OK. (%),VMU Connection. (%),Blocking. (%)
@@ -915,27 +982,31 @@ global  $temp;
 #           $headingi = 18
 #    i = i + 1
     
+//  $pathElement = $Doc->createElement('track');
   $styleURLElement = $Doc->createElement('styleUrl');
   // 0 = single, 1 = master, 2 = slave
   // 0 = ok, 3 = warning, 6 = fault
   $temp = $row;
   $trackLineIndex = 0;
-	$trackLineIndex += checkWarningErrorLevels($temp['DualAntenna.mode']);
 	
+	if ($SwVersion != $OldSwVersion)
+		$trackLineIndex = checkWarningErrorLevels($temp['DualAntenna.mode']);
+	else
+		$trackLineIndex = checkWarningErrorLevels('SINGLE');
 
  	$valueText = '#' . $trackLine[$trackLineIndex];
   $valueText = $Doc->createTextNode($valueText);
   $styleURLElement->appendChild($valueText);
   $pathElement->appendChild($styleURLElement);
   
-  $timeStampElement  = $Doc->createElement('TimeStamp');
-  $valueText = $row['UTC (YYYY-MM-DD hh:mm)'];
-  $valueTextY = substr($valueText,0,10);
-  $valueTextT = substr($valueText,11,16); 
-  $valueText = $valueTextY . 'T' . $valueTextT .':00Z';
-  $valueText = $Doc->createTextNode($valueText);
-  $timeStampElement->appendChild($valueText);
-  $pathElement->appendChild($timeStampElement);
+#//  $timeStampElement  = $Doc->createElement('TimeStamp');
+#//  $valueText = $row['UTC (YYYY-MM-DD hh:mm)'];
+#//  $valueTextY = substr($valueText,0,10);
+#//  $valueTextT = substr($valueText,11,16); 
+#//  $valueText = $valueTextY . 'T' . $valueTextT .':00Z';
+#//  $valueText = $Doc->createTextNode($valueText);
+#//  $timeStampElement->appendChild($valueText);
+#//  $pathElement->appendChild($timeStampElement);
 
 	  $lineElement = $Doc->createElement('LineString');
 	  $coorElement = $Doc->createElement('coordinates');
@@ -1078,7 +1149,7 @@ global $SwVersion13x;
   $documentElementName = createNodeElement($Doc, 'name', 'Description');
   $documentElementFolder->appendChild($documentElementName);
   $placemarkElement = $Doc->createElement('Placemark');
-  $placemarkElementName = createNodeElement($Doc, 'name', 'Parameter limits');
+  $placemarkElementName = createNodeElement($Doc, 'name', 'Parameter limits <br> Dual mode: <br>Blocking not marked!');
   $placemarkElement->appendChild($placemarkElementName);
   $extElement = $Doc->createElement('ExtendedData');
   $placemarkElement->appendChild($extElement);
@@ -1088,38 +1159,44 @@ global $SwVersion13x;
   $i = 0;
   while ( $i < 7 )
   {
-    $dataElement = $Doc->createElement('Data');
-    $dataElement->setAttribute('name', $paramwlist[$i]);
-    $valueElement = $Doc->createElement('value');
-    $dataElement->appendChild($valueElement);
-    if ($warnlist[$i] > 0)
-      $valueText = $Doc->createTextNode($paramwlist[$i] . ' > ' . abs($warnlist[$i]));
-    else if ($warnlist[$i] < 0)
-      $valueText = $Doc->createTextNode($paramwlist[$i] . ' < ' . abs($warnlist[$i]));
-    else
-      $valueText = $Doc->createTextNode('Marked Green');
-     
-    $valueElement->appendChild($valueText);
-    $extElement->appendChild($dataElement);
+    if ( (abs($warnlist[$i]) != 0) || ($i == 0) )
+    {
+	    $dataElement = $Doc->createElement('Data');
+	    $dataElement->setAttribute('name', $paramwlist[$i]);
+	    $valueElement = $Doc->createElement('value');
+	    $dataElement->appendChild($valueElement);
+	    if ($warnlist[$i] > 0)
+	      $valueText = $Doc->createTextNode($paramwlist[$i] . ' > ' . abs($warnlist[$i]));
+	    else if ($warnlist[$i] < 0)
+	      $valueText = $Doc->createTextNode($paramwlist[$i] . ' < ' . abs($warnlist[$i]));
+	    else
+	      $valueText = $Doc->createTextNode('Marked Pink');
+	     
+	    $valueElement->appendChild($valueText);
+	    $extElement->appendChild($dataElement);
+  	}
     $i = $i+1;
   }
   
   $i = 0;
   while ($i < 7 )
   {
-    $dataElement = $Doc->createElement('Data');
-    $dataElement->setAttribute('name', $paramelist[$i]);
-    $valueElement = $Doc->createElement('value');
-    $dataElement->appendChild($valueElement);
-    if ($errorlist[$i] > 0)
-      $valueText = $Doc->createTextNode($paramelist[$i] . ' > ' . abs($errorlist[$i]));
-    else if ($errorlist[$i] < 0)
-      $valueText = $Doc->createTextNode($paramelist[$i] . ' < ' . abs($errorlist[$i]));
-    else
-      $valueText = $Doc->createTextNode('Marked Red');
-      
-    $valueElement->appendChild($valueText);
-    $extElement->appendChild($dataElement);
+    if ( (abs($errorlist[$i]) != 0) || ($i == 0) )
+    {
+	    $dataElement = $Doc->createElement('Data');
+	    $dataElement->setAttribute('name', $paramelist[$i]);
+	    $valueElement = $Doc->createElement('value');
+	    $dataElement->appendChild($valueElement);
+	    if ($errorlist[$i] > 0)
+	      $valueText = $Doc->createTextNode($paramelist[$i] . ' > ' . abs($errorlist[$i]));
+	    else if ($errorlist[$i] < 0)
+	      $valueText = $Doc->createTextNode($paramelist[$i] . ' < ' . abs($errorlist[$i]));
+	    else
+	      $valueText = $Doc->createTextNode('Marked Red');
+	      
+	    $valueElement->appendChild($valueText);
+	    $extElement->appendChild($dataElement);
+  	}
     $i = $i+1;
   }
   $documentElementFolder->appendChild($placemarkElement);
