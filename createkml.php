@@ -1094,12 +1094,14 @@ global $SwVersion13x;
   // skip rows with incomplete position
   while ( ($row['POS.Lat (degree)'] == '') or  ($row['POS.Long (degree)'] == '') )
   {
-   $row = fgetcsv($csvreader);
+   if (($row = fgetcsv($csvreader, 0, ",")) == FALSE )
+    return false;
+   #$row = fgetcsv($csvreader);   
    $row = array_combine ( $order , $row );
    $lastLong = 0;
-   $lastLat = 0;
+   $lastLat = 0;   
   }
-  
+ 
  
   $LookAtElement = createLookAt($Doc, $row);
   $documentElement->appendChild($LookAtElement);
