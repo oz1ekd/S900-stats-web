@@ -906,7 +906,7 @@ global  $bgrError;
 			$valueElement->appendChild($valueText);
 			$extElement->appendChild($dataElement);
 			$dataElement = $Doc->createElement('Data');
-			$dataElement->setAttribute('name', 'Track.GPS (degree)');
+			$dataElement->setAttribute('name', 'Heading.GPS (degree)');
 			$valueElement = $Doc->createElement('value');
 			$dataElement->appendChild($valueElement);
 			if ($GPSheading != -1)
